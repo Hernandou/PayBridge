@@ -11,9 +11,12 @@ public class HelloController {
         return "¡Bienvenido a PayBridge!";
     }
 
-    @GetMapping("/api/hello")
+    @GetMapping("/api/getAllPayMethods")
     public String apiHello() {
-        return "Hello from PayBridge API!";
+        return null;
     }
+
+
 }
+
 

@@ -1,25 +1,25 @@
 package com.paybridge.services;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import com.paybridge.config.WebClientConfig;
+import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.paymentmethod.PaymentMethodClient;
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
+import com.mercadopago.resources.MPResourceList;
+
 import io.github.cdimascio.dotenv.Dotenv;
-import com.mercadopago.sdk.MercadoPagoConfig;
 
 @Service
 public class MercadoPagoService {
 
     private final Dotenv dotenv = Dotenv.load();
-    private final WebClient webClient = WebClientConfig.webClient();
 
-    public String getAllPayMethods() {
+    public String getAllPayMethods() throws MPException, MPApiException {
+    try {
         MercadoPagoConfig.setAccessToken(dotenv.get("ACCESS_TOKEN"));
-
-        
-        return webClient.get()
-            .uri("/payment_methods")
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
+        PaymentMethodClient client = new PaymentMethodClient();
+    } catch (MPException e) {
+        throw new RuntimeException(e);
+    }
     }
     
 }

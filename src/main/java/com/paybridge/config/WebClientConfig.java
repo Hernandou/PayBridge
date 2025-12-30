@@ -8,12 +8,6 @@ public class WebClientConfig {
 
     static String baseUrl = "https://api.mercadopago.com/v1";
 
-    @Bean
-    public static WebClient webClient() {
-        return WebClient.builder()
-            .baseUrl(baseUrl)
-            .build();
-    }
 
 
 }

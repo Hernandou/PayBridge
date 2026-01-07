@@ -7,13 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 @Entity
-@Table(name = "shopping_cart")
-public class ShoppingCartEntity {
-    
+@Table(name = "products")
+
+public class ProductsEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "product_id")
+    private Long productId;
 
     @Column(name = "name")
     private String name;
@@ -23,12 +24,9 @@ public class ShoppingCartEntity {
 
     @Column(name = "price")
     private Double price;
-
-    @Column(name = "quantity")
-    private Integer quantity;
-
-    @Column(name = "total")
-    private Double total;
+    
+    @Column(name = "stock")
+    private Integer stock;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -36,7 +34,4 @@ public class ShoppingCartEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    @Column(name = "status")
-    private String status;
-
 }

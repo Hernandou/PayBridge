@@ -7,9 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 @Entity
-@Table(name = "shopping_cart")
-public class ShoppingCartEntity {
-    
+@Table(name = "users")
+
+public class UsersEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -18,25 +19,15 @@ public class ShoppingCartEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "price")
-    private Double price;
-
-    @Column(name = "quantity")
-    private Integer quantity;
-
-    @Column(name = "total")
-    private Double total;
+    @Column(name = "email")
+    private String email;
+    
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
-    @Column(name = "status")
-    private String status;
-
 }

@@ -196,35 +196,179 @@ INNER JOIN products p ON oi.product_id = p.product_id
 ORDER BY o.user_id, o.orderltem_id;
 
 -- ============================================
--- DATOS DE EJEMPLO (Opcional - para testing)
+-- DATOS DE PRUEBA - Llenar todas las tablas
 -- ============================================
 
--- Insertar usuarios de ejemplo
+-- Limpiar datos existentes (opcional - descomentar si quieres empezar desde cero)
+-- TRUNCATE TABLE orders CASCADE;
+-- TRUNCATE TABLE order_item CASCADE;
+-- TRUNCATE TABLE cart_items CASCADE;
+-- TRUNCATE TABLE products CASCADE;
+-- TRUNCATE TABLE users CASCADE;
+
+-- Alternativa: Eliminar solo datos de prueba (más seguro)
+-- DELETE FROM orders;
+-- DELETE FROM order_item;
+-- DELETE FROM cart_items;
+-- DELETE FROM products WHERE product_id <= 12;
+-- DELETE FROM users WHERE user_id <= 5;
+
+-- ==========================================
+-- BORRAR TODOS LOS DATOS DE LAS TABLAS
+-- ==========================================
+DELETE FROM orders;
+DELETE FROM order_item;
+DELETE FROM cart_items;
+DELETE FROM products;
+DELETE FROM users;
+
+-- ============================================
+-- 1. USUARIOS DE PRUEBA
+-- ============================================
 INSERT INTO users (email, name, password) VALUES
-('juan@email.com', 'Juan Pérez', 'hashed_password_123'),
-('maria@email.com', 'María García', 'hashed_password_456');
+('juan@email.com', 'Juan Pérez', '$2a$10$hashed_password_123'),
+('maria@email.com', 'María García', '$2a$10$hashed_password_456'),
+('carlos@email.com', 'Carlos Rodríguez', '$2a$10$hashed_password_789'),
+('ana@email.com', 'Ana Martínez', '$2a$10$hashed_password_012'),
+('pedro@email.com', 'Pedro López', '$2a$10$hashed_password_345')
+ON CONFLICT (email) DO NOTHING;
 
--- Insertar productos de ejemplo
+-- ============================================
+-- 2. PRODUCTOS DE PRUEBA
+-- ============================================
 INSERT INTO products (name, description, price, stock) VALUES
-('Laptop HP', 'Laptop HP 15.6 pulgadas, 8GB RAM, 256GB SSD', 1000.00, 10),
-('Mouse Logitech', 'Mouse inalámbrico Logitech MX Master', 50.00, 50),
-('Teclado Mecánico', 'Teclado mecánico RGB, switches Cherry MX', 120.00, 30);
+-- Laptops
+('Laptop HP Pavilion', 'Laptop HP 15.6 pulgadas, Intel Core i5, 8GB RAM, 256GB SSD', 1000.00, 15),
+('Laptop Dell Inspiron', 'Laptop Dell 14 pulgadas, AMD Ryzen 5, 16GB RAM, 512GB SSD', 1200.00, 10),
+('Laptop Lenovo ThinkPad', 'Laptop Lenovo 15.6 pulgadas, Intel Core i7, 16GB RAM, 512GB SSD', 1500.00, 8),
 
--- Insertar items al carrito de ejemplo
+-- Periféricos
+('Mouse Logitech MX Master', 'Mouse inalámbrico Logitech MX Master 3, ergonómico', 50.00, 50),
+('Mouse Razer DeathAdder', 'Mouse gaming Razer DeathAdder V3, 20000 DPI', 80.00, 30),
+('Teclado Mecánico RGB', 'Teclado mecánico RGB, switches Cherry MX Red, retroiluminado', 120.00, 25),
+('Teclado Logitech K380', 'Teclado inalámbrico Logitech K380, compacto', 40.00, 40),
+
+-- Monitores
+('Monitor Samsung 27"', 'Monitor Samsung 27 pulgadas, 4K UHD, IPS', 350.00, 12),
+('Monitor LG UltraWide', 'Monitor LG 34 pulgadas, UltraWide, Curvo, 144Hz', 450.00, 8),
+
+-- Audio
+('Auriculares Sony WH-1000XM4', 'Auriculares inalámbricos Sony, cancelación de ruido', 280.00, 20),
+('Auriculares HyperX Cloud II', 'Auriculares gaming HyperX Cloud II, 7.1 surround', 100.00, 35),
+
+-- Almacenamiento
+('Disco SSD Samsung 1TB', 'Disco SSD Samsung 980 PRO, NVMe, 1TB', 150.00, 30),
+('Disco HDD Seagate 2TB', 'Disco duro Seagate BarraCuda, 2TB, 7200 RPM', 60.00, 25);
+
+-- ============================================
+-- 3. ITEMS EN CARRITO DE PRUEBA
+-- ============================================
+-- Usa ON CONFLICT para actualizar cantidad si el producto ya está en el carrito
 INSERT INTO cart_items (user_id, product_id, quantity, price) VALUES
-(1, 1, 2, 1000.00), -- Juan tiene 2 laptops en el carrito
-(1, 2, 1, 50.00);   -- Juan tiene 1 mouse en el carrito
+-- Carrito de Juan (user_id = 1)
+(1, 1, 2, 1000.00),  -- 2 Laptops HP
+(1, 4, 1, 50.00),    -- 1 Mouse Logitech
+(1, 7, 1, 120.00),   -- 1 Teclado Mecánico
 
--- Insertar Order_Items de ejemplo
+-- Carrito de María (user_id = 2)
+(2, 2, 1, 1200.00),  -- 1 Laptop Dell
+(2, 8, 1, 350.00),   -- 1 Monitor Samsung
+(2, 10, 1, 280.00),  -- 1 Auriculares Sony
+
+-- Carrito de Carlos (user_id = 3)
+(3, 3, 1, 1500.00),  -- 1 Laptop Lenovo
+(3, 5, 1, 80.00),    -- 1 Mouse Razer
+(3, 9, 1, 450.00),   -- 1 Monitor LG
+(3, 11, 2, 150.00),  -- 2 Discos SSD Samsung
+
+-- Carrito de Ana (user_id = 4)
+(4, 6, 1, 40.00),    -- 1 Teclado Logitech
+(4, 11, 1, 150.00),  -- 1 Disco SSD
+(4, 12, 1, 60.00)    -- 1 Disco HDD
+ON CONFLICT (user_id, product_id) 
+DO UPDATE SET 
+    quantity = EXCLUDED.quantity,
+    price = EXCLUDED.price,
+    updated_at = CURRENT_TIMESTAMP;
+
+-- ============================================
+-- 4. ORDER_ITEMS DE PRUEBA (Historial de compras)
+-- ============================================
+-- Limpiar order_items existentes antes de insertar (para evitar IDs duplicados)
+DELETE FROM order_item WHERE Orderltem_id <= 15;
+
 INSERT INTO order_item (product_id, quantity, price, subtotal) VALUES
-(1, 2, 1000.00, 2000.00), -- OrderItem #1: 2 laptops
-(2, 1, 50.00, 50.00);     -- OrderItem #2: 1 mouse
+-- OrderItems para Juan
+(1, 1, 1000.00, 1000.00),   -- OrderItem #1: 1 Laptop HP
+(4, 2, 50.00, 100.00),      -- OrderItem #2: 2 Mouse Logitech
+(7, 1, 120.00, 120.00),    -- OrderItem #3: 1 Teclado Mecánico
 
--- Insertar Orders de ejemplo (relación entre User y Order_Item)
--- Nota: En este modelo, cada Order vincula un User con un Order_Item específico
-INSERT INTO orders (user_id, orderltem_id, total, status) VALUES
-(1, 1, 2000.00, 'PAID'),  -- Juan compró OrderItem #1 (2 laptops)
-(1, 2, 50.00, 'PAID');    -- Juan compró OrderItem #2 (1 mouse)
+-- OrderItems para María
+(2, 1, 1200.00, 1200.00),  -- OrderItem #4: 1 Laptop Dell
+(8, 1, 350.00, 350.00),    -- OrderItem #5: 1 Monitor Samsung
+(10, 1, 280.00, 280.00),   -- OrderItem #6: 1 Auriculares Sony
+
+-- OrderItems para Carlos
+(3, 1, 1500.00, 1500.00),  -- OrderItem #7: 1 Laptop Lenovo
+(5, 1, 80.00, 80.00),      -- OrderItem #8: 1 Mouse Razer
+(9, 1, 450.00, 450.00),    -- OrderItem #9: 1 Monitor LG
+(11, 1, 150.00, 150.00),   -- OrderItem #10: 1 Disco SSD
+
+-- OrderItems para Ana
+(6, 1, 40.00, 40.00),      -- OrderItem #11: 1 Teclado Logitech
+(12, 2, 60.00, 120.00),    -- OrderItem #12: 2 Discos HDD
+
+-- OrderItems para Pedro
+(1, 1, 1000.00, 1000.00),  -- OrderItem #13: 1 Laptop HP
+(4, 1, 50.00, 50.00),     -- OrderItem #14: 1 Mouse Logitech
+(7, 1, 120.00, 120.00);   -- OrderItem #15: 1 Teclado Mecánico
+
+-- ============================================
+-- 5. ORDERS DE PRUEBA (Relación User-OrderItem)
+-- ============================================
+-- Limpiar orders existentes antes de insertar
+DELETE FROM orders WHERE user_id <= 5;
+
+INSERT INTO orders (user_id, orderltem_id, total, status, payment_method, shipping_address) VALUES
+-- Órdenes de Juan (user_id = 1)
+(1, 1, 1000.00, 'PAID', 'CREDIT_CARD', 'Calle Principal 123, Ciudad, CP 12345'),
+(1, 2, 100.00, 'PAID', 'CREDIT_CARD', 'Calle Principal 123, Ciudad, CP 12345'),
+(1, 3, 120.00, 'SHIPPED', 'DEBIT_CARD', 'Calle Principal 123, Ciudad, CP 12345'),
+
+-- Órdenes de María (user_id = 2)
+(2, 4, 1200.00, 'PAID', 'PAYPAL', 'Avenida Central 456, Ciudad, CP 67890'),
+(2, 5, 350.00, 'DELIVERED', 'CREDIT_CARD', 'Avenida Central 456, Ciudad, CP 67890'),
+(2, 6, 280.00, 'PAID', 'CREDIT_CARD', 'Avenida Central 456, Ciudad, CP 67890'),
+
+-- Órdenes de Carlos (user_id = 3)
+(3, 7, 1500.00, 'PAID', 'CREDIT_CARD', 'Boulevard Norte 789, Ciudad, CP 11111'),
+(3, 8, 80.00, 'SHIPPED', 'CREDIT_CARD', 'Boulevard Norte 789, Ciudad, CP 11111'),
+(3, 9, 450.00, 'PAID', 'PAYPAL', 'Boulevard Norte 789, Ciudad, CP 11111'),
+(3, 10, 150.00, 'PENDING', 'CREDIT_CARD', 'Boulevard Norte 789, Ciudad, CP 11111'),
+
+-- Órdenes de Ana (user_id = 4)
+(4, 11, 40.00, 'PAID', 'DEBIT_CARD', 'Calle Sur 321, Ciudad, CP 22222'),
+(4, 12, 120.00, 'CANCELLED', 'CREDIT_CARD', 'Calle Sur 321, Ciudad, CP 22222'),
+
+-- Órdenes de Pedro (user_id = 5)
+(5, 13, 1000.00, 'PAID', 'CREDIT_CARD', 'Plaza Mayor 654, Ciudad, CP 33333'),
+(5, 14, 50.00, 'PAID', 'CREDIT_CARD', 'Plaza Mayor 654, Ciudad, CP 33333'),
+(5, 15, 120.00, 'PENDING', 'PAYPAL', 'Plaza Mayor 654, Ciudad, CP 33333');
+
+-- ============================================
+-- VERIFICACIÓN DE DATOS INSERTADOS
+-- ============================================
+
+-- Verificar cantidad de registros insertados
+-- SELECT 'users' AS tabla, COUNT(*) AS cantidad FROM users
+-- UNION ALL
+-- SELECT 'products', COUNT(*) FROM products
+-- UNION ALL
+-- SELECT 'cart_items', COUNT(*) FROM cart_items
+-- UNION ALL
+-- SELECT 'order_item', COUNT(*) FROM order_item
+-- UNION ALL
+-- SELECT 'orders', COUNT(*) FROM orders;
 
 -- ============================================
 -- QUERIES ÚTILES DE CONSULTA
@@ -245,3 +389,23 @@ INSERT INTO orders (user_id, orderltem_id, total, status) VALUES
 -- Obtener todas las órdenes de un usuario (agrupadas)
 -- SELECT user_id, COUNT(*) as total_orders, SUM(total) as total_spent 
 -- FROM orders WHERE user_id = 1 GROUP BY user_id;
+
+-- Ver todos los productos disponibles
+-- SELECT product_id, name, price, stock FROM products ORDER BY name;
+
+-- Ver carritos de todos los usuarios
+-- SELECT * FROM v_user_cart ORDER BY user_id;
+
+-- Ver todas las órdenes con detalles
+-- SELECT * FROM v_order_details ORDER BY user_id, order_date DESC;
+
+-- Estadísticas de ventas por usuario
+-- SELECT 
+--     u.name AS usuario,
+--     COUNT(DISTINCT o.orderltem_id) AS total_items_comprados,
+--     SUM(o.total) AS total_gastado,
+--     COUNT(DISTINCT CASE WHEN o.status = 'PAID' THEN o.orderltem_id END) AS items_pagados
+-- FROM users u
+-- LEFT JOIN orders o ON u.user_id = o.user_id
+-- GROUP BY u.user_id, u.name
+-- ORDER BY total_gastado DESC;

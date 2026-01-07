@@ -5,38 +5,34 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "shopping_cart")
-public class ShoppingCartEntity {
+@Table(name = "order_item")
+public class OrderItemEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "Orderltem_id")
+    private Long orderltemId;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "price")
-    private Double price;
+    // Clave foránea a Product usando @ManyToOne y @JoinColumn
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductsEntity product;
 
     @Column(name = "quantity")
     private Integer quantity;
 
-    @Column(name = "total")
-    private Double total;
+    @Column(name = "price")
+    private Double price;
+
+    @Column(name = "subtotal")
+    private Double subtotal;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
-    @Column(name = "status")
-    private String status;
 
 }

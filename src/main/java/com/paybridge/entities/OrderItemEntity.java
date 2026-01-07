@@ -35,4 +35,52 @@ public class OrderItemEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    public Long getOrderltemId() {
+        return orderltemId;
+    }
+
+    public void setOrderltemId(Long orderltemId) {
+        this.orderltemId = orderltemId;
+    }
+
+    public ProductsEntity getProduct() {
+        return product;
+    }
+
+    public void setProduct(ProductsEntity product) {
+        this.product = product;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Double getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(Double subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.paybridge.dto;
 
 public class ProductDTO {
-    
+
     private Long productId;
     private String name;
     private String description;
@@ -9,13 +9,15 @@ public class ProductDTO {
     private Integer stock;
     private String createdAt;
     private String updatedAt;
+    private Integer quantity;
 
     // Constructor sin argumentos
     public ProductDTO() {
     }
 
     // Constructor completo
-    public ProductDTO(Long productId, String name, String description, Double price, Integer stock, String createdAt, String updatedAt) {
+    public ProductDTO(Long productId, String name, String description, Double price, Integer stock, String createdAt,
+            String updatedAt) {
         this.productId = productId;
         this.name = name;
         this.description = description;
@@ -44,6 +46,14 @@ public class ProductDTO {
 
     public String getDescription() {
         return description;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public void setDescription(String description) {
@@ -95,4 +105,3 @@ public class ProductDTO {
                 '}';
     }
 }
-

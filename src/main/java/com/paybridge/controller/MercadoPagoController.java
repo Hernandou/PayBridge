@@ -2,17 +2,25 @@ package com.paybridge.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.paybridge.services.MercadoPagoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import com.paybridge.services.ShoppingCartService;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.paybridge.services.CartItemService;
+import com.paybridge.services.MercadoPagoService;
+import com.paybridge.services.ShoppingCartService;
 import com.paybridge.dto.ShoppingCartDTO;
+import com.paybridge.dto.ProductDTO;
+import java.util.List;
 
 @RestController
 public class MercadoPagoController {
     @Autowired
     private ShoppingCartService shoppingCartService;
+
+    @Autowired
+    private CartItemService cartItemService;
 
     @Autowired
     private MercadoPagoService mercadoPagoService;
@@ -26,7 +34,6 @@ public class MercadoPagoController {
     public String getAllPayMethods() {
         try {
             return mercadoPagoService.getAllPayMethods();
-             
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
@@ -42,6 +49,23 @@ public class MercadoPagoController {
         }
     }
 
+    @GetMapping("/api/getShoppingCart/{userId}")
+    public ShoppingCartDTO getShoppingCart(@PathVariable Long userId) {
+        try {
+            return shoppingCartService.getShoppingCartByUserId(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/api/createCart")
+    public String createCart(@RequestBody List<ProductDTO> allProducts, @RequestParam Long userId) {
+        try {
+            cartItemService.createCart(allProducts, userId);
+            return "Cart item created successfully";
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
 }
-
-

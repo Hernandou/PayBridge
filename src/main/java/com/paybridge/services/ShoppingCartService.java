@@ -1,4 +1,5 @@
 package com.paybridge.services;
+
 import org.springframework.stereotype.Service;
 import com.paybridge.dto.ShoppingCartDTO;
 import com.paybridge.repository.ShoppingCartRepository;
@@ -6,7 +7,7 @@ import com.paybridge.entities.ShoppingCartEntity;
 import java.time.LocalDateTime;
 
 @Service
-public class ShoppingCartService{
+public class ShoppingCartService {
 
     private final ShoppingCartRepository shoppingCartRepository;
 
@@ -14,8 +15,8 @@ public class ShoppingCartService{
         this.shoppingCartRepository = shoppingCartRepository;
     }
 
-    public void saveShoppingCart(ShoppingCartDTO shoppingCartDTO){
-        //save the shopping cart in the database
+    public void saveShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        // save the shopping cart in the database
         ShoppingCartEntity shoppingCartEntity = new ShoppingCartEntity();
         shoppingCartEntity.setName(shoppingCartDTO.getName());
         shoppingCartEntity.setDescription(shoppingCartDTO.getDescription());
@@ -29,5 +30,9 @@ public class ShoppingCartService{
         shoppingCartRepository.save(shoppingCartEntity);
     }
 
-    
+    public ShoppingCartDTO getShoppingCartByUserId(Long userId) throws Exception {
+
+        return null;
+    }
+
 }

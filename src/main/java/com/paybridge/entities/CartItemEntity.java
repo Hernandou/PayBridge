@@ -1,4 +1,5 @@
 package com.paybridge.entities;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -8,21 +9,22 @@ import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+
 @Entity
 @Table(name = "cart_items")
 public class CartItemEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cart_item_id")
     private Long cartItemId;
 
-    // Clave foránea a User 
+    // Clave foránea a User
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UsersEntity user;
 
-    // Clave foránea a Product 
+    // Clave foránea a Product
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private ProductsEntity product;
@@ -32,7 +34,7 @@ public class CartItemEntity {
 
     @Column(name = "price")
     private Double price;
-    
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -94,5 +96,5 @@ public class CartItemEntity {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
+
 }

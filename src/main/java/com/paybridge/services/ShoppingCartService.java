@@ -1,5 +1,6 @@
 package com.paybridge.services;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.paybridge.dto.ShoppingCartDTO;
@@ -51,6 +52,14 @@ public class ShoppingCartService {
         return entities.stream()
                 .map(shoppingCartMapper::mapEntityToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public ShoppingCartDTO getShoppingCartById(Long shoppingCartId) throws Exception {
+        Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository.findById(shoppingCartId);
+        if (shoppingCart.isEmpty()) {
+            throw new Exception("Shopping cart not found");
+        }
+        return shoppingCartMapper.mapEntityToDTO(shoppingCart.get());
     }
 
 }

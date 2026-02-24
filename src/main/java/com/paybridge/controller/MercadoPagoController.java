@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.paybridge.services.CartItemService;
@@ -49,10 +48,19 @@ public class MercadoPagoController {
         }
     }
 
-    @GetMapping("/api/getShoppingCart")
-    public List<ShoppingCartDTO> getShoppingCart(@RequestParam Long userId) {
+    @GetMapping("/api/getAllShoppingCart")
+    public List<ShoppingCartDTO> getAllShoppingCart(@RequestParam Long userId) {
         try {
             return shoppingCartService.getShoppingCartByUserId(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/api/getShoppingCart")
+    public ShoppingCartDTO getShoppingCart(@RequestParam Long shoppingCartId) {
+        try {
+            return shoppingCartService.getShoppingCartById(shoppingCartId);
         } catch (Exception e) {
             throw new RuntimeException("Error: " + e.getMessage());
         }
@@ -66,6 +74,18 @@ public class MercadoPagoController {
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
+    }
+
+    @PostMapping("/api/buyShoppingCart")
+    public String buyShoppingCart(@RequestParam Long shoppingCartId) {
+
+        try {
+            mercadoPagoService.buyShoppingCart(shoppingCartId);
+            return "Shopping cart bought successfully: " + shoppingCartId;
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+
     }
 
 }

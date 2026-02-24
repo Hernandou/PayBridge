@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import com.paybridge.mappers.CartItemMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.paybridge.dto.ProductDTO;
 import com.paybridge.entities.CartItemEntity;
@@ -12,12 +12,16 @@ import com.paybridge.entities.ProductsEntity;
 import com.paybridge.entities.UsersEntity;
 import com.paybridge.repository.CartItemRepository;
 import org.springframework.stereotype.Service;
+import com.paybridge.dto.CartItemDTO;
 
 @Service
 public class CartItemService {
 
     @Autowired
     private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private CartItemMapper cartItemMapper;
 
     public void createCart(List<ProductDTO> allProducts, Long userId) {
         List<ProductDTO> filteredProducts = allProducts.stream().filter(
@@ -52,6 +56,12 @@ public class CartItemService {
         ProductsEntity product = new ProductsEntity();
         product.setProductId(productId);
         return product;
+    }
+
+    public List<CartItemDTO> getCartItemsByUserId(Long userId) {
+        return cartItemRepository.findByUserId(userId).stream()
+                .map(cartItemMapper::mapEntityToDTO)
+                .collect(Collectors.toList());
     }
 
     private UsersEntity buildUserEntity(Long userId) {

@@ -35,6 +35,9 @@ public class CartItemEntity {
     @Column(name = "price")
     private Double price;
 
+    @Column(name = "product_name")
+    private String productName;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -79,6 +82,14 @@ public class CartItemEntity {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public LocalDateTime getCreatedAt() {

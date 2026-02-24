@@ -49,8 +49,8 @@ public class MercadoPagoController {
         }
     }
 
-    @GetMapping("/api/getShoppingCart/{userId}")
-    public ShoppingCartDTO getShoppingCart(@PathVariable Long userId) {
+    @GetMapping("/api/getShoppingCart")
+    public List<ShoppingCartDTO> getShoppingCart(@RequestParam Long userId) {
         try {
             return shoppingCartService.getShoppingCartByUserId(userId);
         } catch (Exception e) {

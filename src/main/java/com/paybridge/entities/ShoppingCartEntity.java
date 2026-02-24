@@ -1,19 +1,27 @@
 package com.paybridge.entities;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "shopping_cart")
 public class ShoppingCartEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UsersEntity user;
 
     @Column(name = "name")
     private String name;
@@ -35,7 +43,7 @@ public class ShoppingCartEntity {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
+
     @Column(name = "status")
     private String status;
 
@@ -45,6 +53,14 @@ public class ShoppingCartEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UsersEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UsersEntity user) {
+        this.user = user;
     }
 
     public String getName() {
@@ -110,6 +126,5 @@ public class ShoppingCartEntity {
     public void setStatus(String status) {
         this.status = status;
     }
-
 
 }

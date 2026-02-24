@@ -33,22 +33,45 @@ CREATE INDEX idx_name ON products(name);
 
 -- Tabla: CartItem
 -- Relación asociativa entre User y Product (carrito de compras)
-CREATE TABLE cart_items (
-    cart_item_id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    product_id BIGINT NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
-    price DECIMAL(10, 2) NOT NULL, -- Precio al momento de agregar al carrito
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
-    UNIQUE (user_id, product_id) -- Un usuario no puede tener el mismo producto duplicado en el carrito
+CREATE TABLE shopping_cart (
+    id          BIGSERIAL        PRIMARY KEY,
+    user_id     BIGINT           NOT NULL,
+    name        VARCHAR(255),
+    description TEXT,
+    price       DOUBLE PRECISION,
+    quantity    INTEGER,
+    total       DOUBLE PRECISION,
+    status      VARCHAR(50)      NOT NULL DEFAULT 'PENDING',
+    created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_shopping_cart_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+CREATE INDEX idx_shopping_cart_user_id ON shopping_cart(user_id);
 
 -- Índices para cart_items
 CREATE INDEX idx_cart_user_id ON cart_items(user_id);
 CREATE INDEX idx_cart_product_id ON cart_items(product_id);
+
+-- Tabla: ShoppingCart
+-- Snapshot del carrito al momento del checkout
+CREATE TABLE shopping_cart (
+    id          BIGSERIAL        PRIMARY KEY,
+    user_id     BIGINT           NOT NULL REFERENCES users(user_id),
+    name        VARCHAR(255),
+    description TEXT,
+    price       DOUBLE PRECISION,
+    quantity    INTEGER,
+    total       DOUBLE PRECISION,
+    status      VARCHAR(50)      NOT NULL DEFAULT 'PENDING',
+    created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índice para shopping_cart
+CREATE INDEX idx_shopping_cart_user_id ON shopping_cart(user_id);
+
+
 
 -- ============================================
 -- NOTA IMPORTANTE SOBRE EL MODELO:
@@ -354,6 +377,14 @@ INSERT INTO orders (user_id, orderltem_id, total, status, payment_method, shippi
 (5, 13, 1000.00, 'PAID', 'CREDIT_CARD', 'Plaza Mayor 654, Ciudad, CP 33333'),
 (5, 14, 50.00, 'PAID', 'CREDIT_CARD', 'Plaza Mayor 654, Ciudad, CP 33333'),
 (5, 15, 120.00, 'PENDING', 'PAYPAL', 'Plaza Mayor 654, Ciudad, CP 33333');
+
+
+INSERT INTO cart_items (user_id, product_id, product_name, quantity, price, created_at, updated_at) VALUES
+(1, 1, 'Notebook Lenovo IdeaPad',  2, 850.00, NOW(), NOW()),
+(1, 2, 'Mouse Logitech MX Master', 1, 75.50,  NOW(), NOW()),
+(1, 3, 'Teclado Mecánico Redragon',1, 45.00,  NOW(), NOW()),
+(1, 4, 'Monitor Samsung 24"',      1, 220.00, NOW(), NOW()),
+(1, 5, 'Auriculares Sony WH-1000', 1, 180.00, NOW(), NOW())
 
 -- ============================================
 -- VERIFICACIÓN DE DATOS INSERTADOS

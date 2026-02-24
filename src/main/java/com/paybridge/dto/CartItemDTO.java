@@ -1,10 +1,11 @@
 package com.paybridge.dto;
 
 public class CartItemDTO {
-    
+
     private Long cartItemId;
-    private Long userId;        // ID del usuario (en lugar de objeto completo)
-    private Long productId;     // ID del producto (en lugar de objeto completo)
+    private Long userId; // ID del usuario (en lugar de objeto completo)
+    private Long productId; // ID del producto (en lugar de objeto completo)
+    private String productName;
     private Integer quantity;
     private Double price;
     private String createdAt;
@@ -15,10 +16,12 @@ public class CartItemDTO {
     }
 
     // Constructor completo
-    public CartItemDTO(Long cartItemId, Long userId, Long productId, Integer quantity, Double price, String createdAt, String updatedAt) {
+    public CartItemDTO(Long cartItemId, Long userId, Long productId, String productName, Integer quantity, Double price,
+            String createdAt, String updatedAt) {
         this.cartItemId = cartItemId;
         this.userId = userId;
         this.productId = productId;
+        this.productName = productName;
         this.quantity = quantity;
         this.price = price;
         this.createdAt = createdAt;
@@ -48,6 +51,14 @@ public class CartItemDTO {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public Integer getQuantity() {
@@ -95,4 +106,3 @@ public class CartItemDTO {
                 '}';
     }
 }
-

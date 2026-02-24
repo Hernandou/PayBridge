@@ -1,13 +1,21 @@
 package com.paybridge.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.paybridge.dto.ShoppingCartDTO;
-import com.paybridge.repository.ShoppingCartRepository;
 import com.paybridge.entities.ShoppingCartEntity;
+import com.paybridge.entities.UsersEntity;
+import com.paybridge.mappers.ShoppingCartMapper;
+import com.paybridge.repository.ShoppingCartRepository;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShoppingCartService {
+
+    @Autowired
+    private ShoppingCartMapper shoppingCartMapper;
 
     private final ShoppingCartRepository shoppingCartRepository;
 
@@ -16,8 +24,8 @@ public class ShoppingCartService {
     }
 
     public void saveShoppingCart(ShoppingCartDTO shoppingCartDTO) {
-        // save the shopping cart in the database
         ShoppingCartEntity shoppingCartEntity = new ShoppingCartEntity();
+        shoppingCartEntity.setUser(buildUserEntity(Long.parseLong(shoppingCartDTO.getUserId())));
         shoppingCartEntity.setName(shoppingCartDTO.getName());
         shoppingCartEntity.setDescription(shoppingCartDTO.getDescription());
         shoppingCartEntity.setPrice(Double.parseDouble(shoppingCartDTO.getPrice()));
@@ -26,13 +34,23 @@ public class ShoppingCartService {
         shoppingCartEntity.setStatus(shoppingCartDTO.getStatus());
         shoppingCartEntity.setCreatedAt(LocalDateTime.now());
         shoppingCartEntity.setUpdatedAt(LocalDateTime.now());
-        System.out.println(shoppingCartEntity.toString());
         shoppingCartRepository.save(shoppingCartEntity);
     }
 
-    public ShoppingCartDTO getShoppingCartByUserId(Long userId) throws Exception {
+    private UsersEntity buildUserEntity(Long userId) {
+        UsersEntity user = new UsersEntity();
+        user.setUserId(userId);
+        return user;
+    }
 
-        return null;
+    public List<ShoppingCartDTO> getShoppingCartByUserId(Long userId) throws Exception {
+        List<ShoppingCartEntity> entities = shoppingCartRepository.findByUserId(userId);
+        if (entities.isEmpty()) {
+            throw new Exception("No shopping cart history found for user: " + userId);
+        }
+        return entities.stream()
+                .map(shoppingCartMapper::mapEntityToDTO)
+                .collect(Collectors.toList());
     }
 
 }

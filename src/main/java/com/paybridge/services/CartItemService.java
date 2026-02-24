@@ -56,7 +56,7 @@ public class CartItemService {
 
     private UsersEntity buildUserEntity(Long userId) {
         UsersEntity user = new UsersEntity();
-        user.setId(userId);
+        user.setUserId(userId);
         return user;
     }
 

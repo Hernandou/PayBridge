@@ -1,8 +1,8 @@
 package com.paybridge.dto;
 
 public class ShoppingCartDTO {
-    
     private String id;
+    private String userId;
     private String name;
     private String description;
     private String price;
@@ -12,9 +12,13 @@ public class ShoppingCartDTO {
     private String updatedAt;
     private String status;
 
+    public ShoppingCartDTO() {
+    }
 
-    public ShoppingCartDTO(String id, String name, String description, String price, String quantity, String total, String createdAt, String updatedAt, String status) {
+    public ShoppingCartDTO(String id, String userId, String name, String description, String price, String quantity,
+            String total, String createdAt, String updatedAt, String status) {
         this.id = id;
+        this.userId = userId;
         this.name = name;
         this.description = description;
         this.price = price;
@@ -27,6 +31,14 @@ public class ShoppingCartDTO {
 
     public String getId() {
         return id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -63,7 +75,9 @@ public class ShoppingCartDTO {
 
     @Override
     public String toString() {
-        return "ShoppingCartDTO [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price + ", quantity=" + quantity + ", total=" + total + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", status=" + status + "]";
+        return "ShoppingCartDTO [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price
+                + ", quantity=" + quantity + ", total=" + total + ", createdAt=" + createdAt + ", updatedAt="
+                + updatedAt + ", status=" + status + "]";
     }
 
 }

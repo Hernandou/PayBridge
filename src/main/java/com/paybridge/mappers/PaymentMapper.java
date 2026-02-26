@@ -1,6 +1,5 @@
 package com.paybridge.mappers;
 
-
 public class PaymentMapper {
     String paymentMethodName;
     String bankingEntityName;
@@ -37,6 +36,3 @@ public class PaymentMapper {
         this.secureLogoURL = secureLogoURL;
     }
 }
-
-
-

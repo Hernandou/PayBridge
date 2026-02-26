@@ -9,8 +9,8 @@ public class ShoppingCartMapper {
 
     public ShoppingCartDTO mapEntityToDTO(ShoppingCartEntity shoppingCartEntity) {
         return new ShoppingCartDTO(
-                shoppingCartEntity.getId() != null ? shoppingCartEntity.getId().toString() : null,
-                shoppingCartEntity.getUser() != null ? shoppingCartEntity.getUser().getUserId().toString() : null,
+                shoppingCartEntity.getId(),
+                shoppingCartEntity.getUser() != null ? shoppingCartEntity.getUser().getUserId() : null,
                 shoppingCartEntity.getName(),
                 shoppingCartEntity.getDescription(),
                 shoppingCartEntity.getPrice() != null ? shoppingCartEntity.getPrice().toString() : null,

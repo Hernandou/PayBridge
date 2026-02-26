@@ -8,6 +8,7 @@ import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.paymentmethod.PaymentMethodClient;
 import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
 import com.mercadopago.client.preference.PreferenceClient;
+import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
@@ -26,8 +27,10 @@ import com.mercadopago.resources.paymentmethod.PaymentMethodFinancialInstitution
 import com.mercadopago.resources.preference.Preference;
 import com.paybridge.mappers.ShoppingCartMapper;
 import com.paybridge.dto.ShoppingCartDTO;
-import java.util.Collections;
+import com.paybridge.dto.UserDTO;
 import com.paybridge.dto.CartItemDTO;
+import com.mercadopago.client.preference.PreferencePayerRequest;
+import com.paybridge.mappers.PreferenceItemsRequestMapper;
 
 @Service
 public class MercadoPagoService {
@@ -39,7 +42,13 @@ public class MercadoPagoService {
     private ShoppingCartMapper shoppingCartMapper;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private CartItemService cartItemService;
+
+    @Autowired
+    private PreferenceItemsRequestMapper preferenceItemsRequestMapper;
 
     private final Dotenv dotenv = Dotenv.load();
 
@@ -83,15 +92,25 @@ public class MercadoPagoService {
 
                 ShoppingCartDTO shoppingCartDTO = this.shoppingCartMapper.mapEntityToDTO(shoppingCart.get());
                 Long userId = Long.valueOf(shoppingCartDTO.getUserId());
+                UserDTO user = this.userService.getUserById(userId);
+
                 List<CartItemDTO> cartItems = this.cartItemService.getCartItemsByUserId(userId);
 
+                List<PreferenceItemRequest> preferenceItems = cartItems.stream().map((cartItem) -> {
+                    return this.preferenceItemsRequestMapper.mapToPreferenceItemRequest(cartItem);
+                }).collect(Collectors.toList());
+
                 PreferenceRequest preferenceRequest = PreferenceRequest.builder()
-                        .items(Collections.singletonList(cartItems))
-                        .backUrls(PreferenceBackUrlsRequest.builder())
+                        .items(preferenceItems)
+                        .payer(PreferencePayerRequest.builder().email(user.getEmail()).build())
+                        .backUrls(PreferenceBackUrlsRequest.builder().success("http://localhost:8080/success")
+                                .failure("http://localhost:8080/failure").pending("http://localhost:8080/pending")
+                                .build()) // Implementacion de vistas de redireccion para el frontend
                         .build();
 
                 PreferenceClient client = new PreferenceClient();
                 Preference preference = client.create(preferenceRequest);
+
             } else {
                 throw new RuntimeException("Shopping cart not found");
             }

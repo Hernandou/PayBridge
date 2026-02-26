@@ -1,8 +1,8 @@
 package com.paybridge.dto;
 
 public class ShoppingCartDTO {
-    private String id;
-    private String userId;
+    private Long id;
+    private Long userId;
     private String name;
     private String description;
     private String price;
@@ -15,7 +15,7 @@ public class ShoppingCartDTO {
     public ShoppingCartDTO() {
     }
 
-    public ShoppingCartDTO(String id, String userId, String name, String description, String price, String quantity,
+    public ShoppingCartDTO(Long id, Long userId, String name, String description, String price, String quantity,
             String total, String createdAt, String updatedAt, String status) {
         this.id = id;
         this.userId = userId;
@@ -29,15 +29,15 @@ public class ShoppingCartDTO {
         this.status = status;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

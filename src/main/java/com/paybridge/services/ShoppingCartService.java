@@ -26,7 +26,7 @@ public class ShoppingCartService {
 
     public void saveShoppingCart(ShoppingCartDTO shoppingCartDTO) {
         ShoppingCartEntity shoppingCartEntity = new ShoppingCartEntity();
-        shoppingCartEntity.setUser(buildUserEntity(Long.parseLong(shoppingCartDTO.getUserId())));
+        shoppingCartEntity.setUser(buildUserEntity(shoppingCartDTO.getUserId()));
         shoppingCartEntity.setName(shoppingCartDTO.getName());
         shoppingCartEntity.setDescription(shoppingCartDTO.getDescription());
         shoppingCartEntity.setPrice(Double.parseDouble(shoppingCartDTO.getPrice()));
@@ -60,6 +60,34 @@ public class ShoppingCartService {
             throw new Exception("Shopping cart not found");
         }
         return shoppingCartMapper.mapEntityToDTO(shoppingCart.get());
+    }
+
+    public String updateShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+
+        ShoppingCartEntity shoppingCartEntity = this.shoppingCartRepository.findById(shoppingCartDTO.getId()).get();
+        if (shoppingCartEntity == null) {
+            return "Shopping cart not found";
+        } else {
+            shoppingCartEntity.setQuantity(Integer.parseInt(shoppingCartDTO.getQuantity()));
+            shoppingCartEntity.setTotal(Double.parseDouble(shoppingCartDTO.getTotal()));
+            shoppingCartEntity.setUpdatedAt(LocalDateTime.now());
+            shoppingCartRepository.save(shoppingCartEntity);
+        }
+
+        return "Shopping cart updated successfully";
+
+    }
+
+    public String deleteShoppingCart(Long shoppingCartId) {
+        ShoppingCartEntity shoppingCartEntity = this.shoppingCartRepository.findById(shoppingCartId).get();
+
+        if (shoppingCartEntity == null) {
+            return "Shopping cart not found";
+        } else {
+            this.shoppingCartRepository.delete(shoppingCartEntity);
+            return "Shopping cart deleted successfully";
+        }
+
     }
 
 }

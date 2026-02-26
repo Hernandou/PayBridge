@@ -4,8 +4,10 @@ import com.paybridge.dto.CartItemDTO;
 import com.paybridge.entities.CartItemEntity;
 import com.paybridge.entities.ProductsEntity;
 import com.paybridge.entities.UsersEntity;
+import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
+@Component
 public class CartItemMapper {
 
     public CartItemEntity mapDTOToEntity(CartItemDTO cartItemDTO) {

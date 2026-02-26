@@ -3,7 +3,9 @@ package com.paybridge.mappers;
 import com.paybridge.dto.ProductDTO;
 import com.paybridge.entities.ProductsEntity;
 import java.time.LocalDateTime;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProductMapper {
 
     public ProductsEntity mapDTOToEntity(ProductDTO productDTO) {

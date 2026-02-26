@@ -1,9 +1,11 @@
 package com.paybridge.mappers;
 
+import org.springframework.stereotype.Component;
 import com.paybridge.dto.UserDTO;
 import com.paybridge.entities.UsersEntity;
 import java.time.LocalDateTime;
 
+@Component
 public class UserMapper {
 
     public UsersEntity mapDTOToEntity(UserDTO userDTO) {

@@ -10,6 +10,7 @@ import com.paybridge.mappers.ShoppingCartMapper;
 import com.paybridge.repository.ShoppingCartRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.paybridge.exceptions.ShoppingCartNotFoundException;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,11 +79,11 @@ public class ShoppingCartService {
 
     }
 
-    public String deleteShoppingCart(Long shoppingCartId) {
+    public String deleteShoppingCart(Long shoppingCartId) throws ShoppingCartNotFoundException {
         ShoppingCartEntity shoppingCartEntity = this.shoppingCartRepository.findById(shoppingCartId).get();
 
         if (shoppingCartEntity == null) {
-            return "Shopping cart not found";
+            throw new ShoppingCartNotFoundException();
         } else {
             this.shoppingCartRepository.delete(shoppingCartEntity);
             return "Shopping cart deleted successfully";

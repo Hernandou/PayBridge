@@ -6,15 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.paymentmethod.PaymentMethodClient;
-import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
-import com.mercadopago.client.preference.PreferenceClient;
-import com.mercadopago.client.preference.PreferenceItemRequest;
-import com.mercadopago.client.preference.PreferenceRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.net.MPResourceList;
+import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.paymentmethod.PaymentMethod;
 import com.paybridge.mappers.PaymentMapper;
+import com.paybridge.dto.PaymentBodyDTO;
+import com.mercadopago.client.payment.PaymentCreateRequest;
+import com.mercadopago.client.payment.PaymentPayerRequest;
 import com.paybridge.repository.ShoppingCartRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.stream.Stream;
@@ -24,13 +24,12 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 import com.paybridge.entities.ShoppingCartEntity;
 import com.mercadopago.resources.paymentmethod.PaymentMethodFinancialInstitutions;
-import com.mercadopago.resources.preference.Preference;
 import com.paybridge.mappers.ShoppingCartMapper;
 import com.paybridge.dto.ShoppingCartDTO;
 import com.paybridge.dto.UserDTO;
-import com.paybridge.dto.CartItemDTO;
-import com.mercadopago.client.preference.PreferencePayerRequest;
-import com.paybridge.mappers.PreferenceItemsRequestMapper;
+import com.mercadopago.client.payment.PaymentClient;
+import java.math.BigDecimal;
+import com.paybridge.exceptions.UserNotFoundException;
 
 @Service
 public class MercadoPagoService {
@@ -43,12 +42,6 @@ public class MercadoPagoService {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private CartItemService cartItemService;
-
-    @Autowired
-    private PreferenceItemsRequestMapper preferenceItemsRequestMapper;
 
     private final Dotenv dotenv = Dotenv.load();
 
@@ -85,40 +78,56 @@ public class MercadoPagoService {
         }
     }
 
-    public String buyShoppingCart(Long shoppingCartId) {
+    public String buyShoppingCart(PaymentBodyDTO paymentBodyDTO) throws UserNotFoundException {
         try {
-            Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository.findById(shoppingCartId);
+            Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository
+                    .findById(paymentBodyDTO.getShoppingCartId());
             if (shoppingCart.isPresent()) {
 
                 ShoppingCartDTO shoppingCartDTO = this.shoppingCartMapper.mapEntityToDTO(shoppingCart.get());
                 Long userId = Long.valueOf(shoppingCartDTO.getUserId());
-                UserDTO user = this.userService.getUserById(userId);
+                UserDTO userDTO = this.userService.getUserById(userId);
 
-                List<CartItemDTO> cartItems = this.cartItemService.getCartItemsByUserId(userId);
+                if (userDTO != null && shoppingCartDTO != null) {
+                    BigDecimal price = new BigDecimal(shoppingCartDTO.getPrice());
+                    String PAYMENT_TOKEN = paymentBodyDTO.getPaymentToken();
+                    PaymentCreateRequest paymentRequest = buildPaymentRequest(shoppingCartDTO, userDTO, price,
+                            PAYMENT_TOKEN);
 
-                List<PreferenceItemRequest> preferenceItems = cartItems.stream().map((cartItem) -> {
-                    return this.preferenceItemsRequestMapper.mapToPreferenceItemRequest(cartItem);
-                }).collect(Collectors.toList());
+                    try {
+                        MercadoPagoConfig.setAccessToken(dotenv.get("ACCESS_TOKEN"));
+                        PaymentClient paymentClient = new PaymentClient();
+                        Payment payment = paymentClient.create(paymentRequest);
+                        return payment.getStatus();
 
-                PreferenceRequest preferenceRequest = PreferenceRequest.builder()
-                        .items(preferenceItems)
-                        .payer(PreferencePayerRequest.builder().email(user.getEmail()).build())
-                        .backUrls(PreferenceBackUrlsRequest.builder().success("http://localhost:8080/success")
-                                .failure("http://localhost:8080/failure").pending("http://localhost:8080/pending")
-                                .build()) // Implementacion de vistas de redireccion para el frontend
-                        .build();
+                    } catch (MPException | MPApiException e) {
+                        throw new RuntimeException(e);
+                    }
 
-                PreferenceClient client = new PreferenceClient();
-                Preference preference = client.create(preferenceRequest);
+                }
 
             } else {
-                throw new RuntimeException("Shopping cart not found");
+                throw new UserNotFoundException();
             }
 
             return "";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public PaymentCreateRequest buildPaymentRequest(ShoppingCartDTO shoppingCartDTO, UserDTO userDTO, BigDecimal price,
+            String PAYMENT_TOKEN) {
+        return PaymentCreateRequest.builder()
+                .transactionAmount(price)
+                .token(PAYMENT_TOKEN)
+                .description(shoppingCartDTO.getDescription())
+                .installments(1)
+                .paymentMethodId("visa")
+                .payer(PaymentPayerRequest.builder()
+                        .email(userDTO.getEmail())
+                        .build())
+                .build();
     }
 
 }

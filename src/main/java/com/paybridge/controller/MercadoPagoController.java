@@ -12,6 +12,9 @@ import com.paybridge.services.CartItemService;
 import com.paybridge.services.MercadoPagoService;
 import com.paybridge.services.ShoppingCartService;
 import com.paybridge.dto.ShoppingCartDTO;
+import com.paybridge.exceptions.ShoppingCartNotFoundException;
+import com.paybridge.exceptions.UserNotFoundException;
+import com.paybridge.dto.PaymentBodyDTO;
 import com.paybridge.dto.ProductDTO;
 import java.util.List;
 
@@ -45,7 +48,11 @@ public class MercadoPagoController {
         try {
             shoppingCartService.saveShoppingCart(shoppingCartDTO);
             return "Shopping cart created successfully: " + shoppingCartDTO.getId();
-        } catch (Exception e) {
+        } catch (UserNotFoundException unfe) {
+            return "Error: " + unfe.getMessage();
+        }
+
+        catch (Exception e) {
             return "Error: " + e.getMessage();
         }
     }
@@ -93,17 +100,19 @@ public class MercadoPagoController {
         try {
             shoppingCartService.deleteShoppingCart(shoppingCartId);
             return "Shopping cart deleted successfully: " + shoppingCartId;
+        } catch (ShoppingCartNotFoundException scnte) {
+            return "Error: " + scnte.getMessage();
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }
     }
 
     @PostMapping("/api/buyShoppingCart")
-    public String buyShoppingCart(@RequestParam Long shoppingCartId) {
+    public String buyShoppingCart(@RequestBody PaymentBodyDTO paymentBodyDTO) {
 
         try {
-            mercadoPagoService.buyShoppingCart(shoppingCartId);
-            return "Shopping cart bought successfully: " + shoppingCartId;
+            mercadoPagoService.buyShoppingCart(paymentBodyDTO);
+            return "Shopping cart bought successfully: " + paymentBodyDTO.getShoppingCartId();
         } catch (Exception e) {
             return "Error: " + e.getMessage();
         }

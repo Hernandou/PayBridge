@@ -56,9 +56,12 @@ public class ShoppingCartService {
     }
 
     public ShoppingCartDTO getShoppingCartById(Long shoppingCartId) throws Exception {
+        if (shoppingCartId == null) {
+            throw new ShoppingCartNotFoundException();
+        }
         Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository.findById(shoppingCartId);
         if (shoppingCart.isEmpty()) {
-            throw new Exception("Shopping cart not found");
+            throw new ShoppingCartNotFoundException();
         }
         return shoppingCartMapper.mapEntityToDTO(shoppingCart.get());
     }

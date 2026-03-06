@@ -119,4 +119,15 @@ public class MercadoPagoController {
 
     }
 
+    @PostMapping("/api/MPNotifications")
+    public String MPNotifications(@RequestBody String paymentBodyDTO) {
+        try {
+            System.out.println("Payment notification received: " + paymentBodyDTO);
+            return "Shopping cart bought successfully: " + paymentBodyDTO;
+
+        } catch (Exception e) {
+            return "Error: " + e.getMessage();
+        }
+    }
+
 }

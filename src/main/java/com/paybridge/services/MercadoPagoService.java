@@ -30,6 +30,7 @@ import com.paybridge.dto.UserDTO;
 import com.mercadopago.client.payment.PaymentClient;
 import java.math.BigDecimal;
 import com.paybridge.exceptions.UserNotFoundException;
+import com.paybridge.exceptions.RestExceptions.NoBodyDataException;
 
 @Service
 public class MercadoPagoService {
@@ -78,8 +79,13 @@ public class MercadoPagoService {
         }
     }
 
-    public String buyShoppingCart(PaymentBodyDTO paymentBodyDTO) throws UserNotFoundException {
+    public String buyShoppingCart(PaymentBodyDTO paymentBodyDTO) throws UserNotFoundException, NoBodyDataException {
         try {
+
+            if (paymentBodyDTO == null) {
+                throw new NoBodyDataException();
+            }
+
             Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository
                     .findById(paymentBodyDTO.getShoppingCartId());
             if (shoppingCart.isPresent()) {
@@ -94,15 +100,10 @@ public class MercadoPagoService {
                     PaymentCreateRequest paymentRequest = buildPaymentRequest(shoppingCartDTO, userDTO, price,
                             PAYMENT_TOKEN);
 
-                    try {
-                        MercadoPagoConfig.setAccessToken(dotenv.get("ACCESS_TOKEN"));
-                        PaymentClient paymentClient = new PaymentClient();
-                        Payment payment = paymentClient.create(paymentRequest);
-                        return payment.getStatus();
-
-                    } catch (MPException | MPApiException e) {
-                        throw new RuntimeException(e);
-                    }
+                    MercadoPagoConfig.setAccessToken(dotenv.get("ACCESS_TOKEN"));
+                    PaymentClient paymentClient = new PaymentClient();
+                    Payment payment = paymentClient.create(paymentRequest);
+                    return payment.getStatus();
 
                 }
 
@@ -111,6 +112,12 @@ public class MercadoPagoService {
             }
 
             return "";
+        } catch (NoBodyDataException e) {
+            throw e;
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (MPException | MPApiException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
